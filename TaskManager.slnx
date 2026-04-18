@@ -2,5 +2,5 @@
   <Folder Name="/Solution Items/">
     <File Path="README.md" />
   </Folder>
-  <Project Path="TaskManager/TaskManager.csproj" />
+  <Project Path="src/TaskManager/TaskManager.csproj" />
 </Solution>
