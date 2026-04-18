@@ -3,11 +3,11 @@ using TaskManager.Options;
 
 namespace TaskManager.Services;
 
-public class BackgroundTaskProcessor(
+public partial class BackgroundTaskProcessor(
+    IPauseService pauseService,
     TaskQueueService queueService,
     ILogger<BackgroundTaskProcessor> logger,
-    IOptions<BackgroundTaskProcessorOptions> options,
-    PauseService pauseService)
+    IOptions<BackgroundTaskProcessorOptions> options)
     : BackgroundService
 {
     private readonly int _workerCount = options.Value.WorkerCount;
@@ -22,13 +22,10 @@ public class BackgroundTaskProcessor(
             {
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    pauseService.WaitIfPaused(stoppingToken);
+                    await pauseService.WaitIfPaused(stoppingToken);
 
                     var task = await queueService.DequeueAsync(stoppingToken);
-                    logger.LogInformation("{timespan:HH:mm:ss} - Worker {workerId}: {task}",
-                        DateTime.UtcNow,
-                        workerId,
-                        task);
+                    LogTask(DateTime.UtcNow, workerId, task);
 
                     await Task.Delay(1000, stoppingToken);
                 }
@@ -36,4 +33,7 @@ public class BackgroundTaskProcessor(
         }
         return Task.WhenAll(tasks);
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Worker {workerId}: {timespan:HH:mm:ss} - {task}")]
+    private partial void LogTask(DateTime timespan, int workerId, string task);
 }

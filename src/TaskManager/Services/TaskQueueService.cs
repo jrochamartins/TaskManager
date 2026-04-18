@@ -4,8 +4,13 @@ namespace TaskManager.Services;
 
 public class TaskQueueService
 {
-    private readonly Channel<string> _channel = Channel.CreateUnbounded<string>(
-        new UnboundedChannelOptions { SingleReader = false, SingleWriter = false });
+    private readonly Channel<string> _channel = Channel.CreateBounded<string>(
+        new BoundedChannelOptions(10)
+        {
+            FullMode = BoundedChannelFullMode.Wait,
+            SingleReader = false,
+            SingleWriter = false
+        });
 
     public async ValueTask EnqueueAsync(string task)
     {

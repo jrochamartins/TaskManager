@@ -19,13 +19,13 @@ public static class TaskEndpoints
         return Results.Accepted();
     }
 
-    private static IResult PauseEndpoint(PauseService pauseService)
+    private static IResult PauseEndpoint(IPauseService pauseService)
     {
         pauseService.Pause();
         return Results.Ok("Paused");
     }
 
-    private static IResult ResumeEndpoint(PauseService pauseService)
+    private static IResult ResumeEndpoint(IPauseService pauseService)
     {
         pauseService.Resume();
         return Results.Ok("Resumed");

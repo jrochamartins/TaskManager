@@ -1,7 +1,7 @@
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<TaskManager.Services.TaskQueueService>();
-builder.Services.AddSingleton<TaskManager.Services.PauseService>();
+builder.Services.AddSingleton<TaskManager.Services.IPauseService, TaskManager.Services.PauseServiceTcs>();
 builder.Services.Configure<TaskManager.Options.BackgroundTaskProcessorOptions>(
     builder.Configuration.GetSection("BackgroundTaskProcessor"));
 builder.Services.AddHostedService<TaskManager.Services.BackgroundTaskProcessor>();
