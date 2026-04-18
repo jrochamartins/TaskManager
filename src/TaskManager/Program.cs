@@ -1,3 +1,5 @@
+using Scalar.AspNetCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<TaskManager.Services.TaskQueueService>();
@@ -5,19 +7,15 @@ builder.Services.AddSingleton<TaskManager.Services.IPauseService, TaskManager.Se
 builder.Services.Configure<TaskManager.Options.BackgroundTaskProcessorOptions>(
     builder.Configuration.GetSection("BackgroundTaskProcessor"));
 builder.Services.AddHostedService<TaskManager.Services.BackgroundTaskProcessor>();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.RoutePrefix = string.Empty;
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "TaskManager API v1");
-    });
+{   
+    app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();

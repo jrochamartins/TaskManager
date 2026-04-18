@@ -27,7 +27,8 @@ public partial class BackgroundTaskProcessor(
                     var task = await queueService.DequeueAsync(stoppingToken);
                     LogTask(DateTime.UtcNow, workerId, task);
 
-                    await Task.Delay(1000, stoppingToken);
+                    //Mock
+                    //await Task.Delay(1000, stoppingToken);
                 }
             }, stoppingToken));
         }
