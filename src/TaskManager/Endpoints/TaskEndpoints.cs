@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using TaskManager.Services;
 
 namespace TaskManager.Endpoints;
@@ -11,10 +12,11 @@ public static class TaskEndpoints
         app.MapPost("/api/resume", ResumeEndpoint);
     }
 
-    private static async Task<IResult> PostTask(string task, TaskQueueService queueService)
+    private static async Task<IResult> PostTask([FromQuery] string? task, TaskQueueService queueService)
     {
         if (string.IsNullOrWhiteSpace(task))
             return Results.BadRequest("Task cannot be empty.");
+
         await queueService.EnqueueAsync(task);
         return Results.Accepted();
     }
