@@ -1,22 +1,21 @@
-namespace TaskManager.Services
+namespace TaskManager.Services;
+
+public class PauseService
 {
-    public class PauseService
+    private readonly ManualResetEventSlim _pauseEvent = new(false); // Começa pausado
+
+    public void Pause()
     {
-        private readonly ManualResetEventSlim _pauseEvent = new(false); // Começa pausado
+        _pauseEvent.Reset();
+    }
 
-        public void Pause()
-        {
-            _pauseEvent.Reset();
-        }
+    public void Resume()
+    {
+        _pauseEvent.Set();
+    }
 
-        public void Resume()
-        {
-            _pauseEvent.Set();
-        }
-
-        public void WaitIfPaused(CancellationToken cancellationToken)
-        {
-            _pauseEvent.Wait(cancellationToken);
-        }
+    public void WaitIfPaused(CancellationToken cancellationToken)
+    {
+        _pauseEvent.Wait(cancellationToken);
     }
 }
