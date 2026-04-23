@@ -11,30 +11,29 @@ public partial class BackgroundProcessor(
 {
     private readonly int _workerCount = options.Value.WorkerCount;
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        List<Task> tasks = [];
+    protected override Task ExecuteAsync(CancellationToken token) =>
+        Task.WhenAll(Workers(token));
 
+    private IEnumerable<Task> Workers(CancellationToken token)
+    {
         for (var i = 0; i < _workerCount; i++)
         {
             var workerId = i + 1;
-
-            tasks.Add(Task.Run(async () =>
-            {
-                while (!stoppingToken.IsCancellationRequested)
-                {
-                    await pauseService.WaitIfPaused();
-
-                    var task = await queueService.DequeueAsync(stoppingToken);
-                    LogTask(DateTime.UtcNow, workerId, task);
-
-                    await Task.Delay(task.Length * 100, stoppingToken);
-                }
-            }, stoppingToken));
-
+            yield return Task.Run(() => Work(workerId, token), token);
         }
+    }
 
-        return Task.WhenAll(tasks);
+    private async Task Work(int workerId, CancellationToken token)
+    {
+        while (!token.IsCancellationRequested)
+        {
+            await pauseService.WaitIfPaused();
+
+            var task = await queueService.DequeueAsync(token);
+            LogTask(DateTime.UtcNow, workerId, task);
+
+            await Task.Delay(task.Length * 100, token);
+        }
     }
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Worker {workerId}: {timespan:HH:mm:ss} - {task}")]
