@@ -1,6 +1,6 @@
 namespace TaskManager.Options;
 
-public class BackgroundTaskProcessorOptions
+public class BackgroundProcessorOptions
 {
     public int WorkerCount { get; set; } = 1;
 }

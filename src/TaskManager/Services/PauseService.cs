@@ -1,16 +1,16 @@
 ﻿namespace TaskManager.Services;
 
-public class PauseServiceTcs : IPauseService
+public class PauseService
 {
-    private volatile TaskCompletionSource<bool> _tcs = new();
+    private TaskCompletionSource<bool> _tcs = new();
 
-    public PauseServiceTcs(bool initialState = false)
+    public PauseService(bool initialState = true)
     {
         if (initialState)
             _tcs.SetResult(true);
     }
 
-    public Task WaitIfPaused(CancellationToken cancellationToken) =>
+    public Task WaitIfPaused() =>
         _tcs.Task;
 
     public void Pause()

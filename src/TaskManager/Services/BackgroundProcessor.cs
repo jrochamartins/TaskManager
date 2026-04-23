@@ -3,34 +3,37 @@ using TaskManager.Options;
 
 namespace TaskManager.Services;
 
-public partial class BackgroundTaskProcessor(
-    IPauseService pauseService,
-    TaskQueueService queueService,
-    ILogger<BackgroundTaskProcessor> logger,
-    IOptions<BackgroundTaskProcessorOptions> options)
-    : BackgroundService
+public partial class BackgroundProcessor(
+    IOptions<BackgroundProcessorOptions> options,
+    ILogger<BackgroundProcessor> logger,
+    QueueService queueService,
+    PauseService pauseService) : BackgroundService
 {
     private readonly int _workerCount = options.Value.WorkerCount;
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var tasks = new List<Task>();
+        List<Task> tasks = [];
+
         for (var i = 0; i < _workerCount; i++)
         {
             var workerId = i + 1;
+
             tasks.Add(Task.Run(async () =>
             {
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    await pauseService.WaitIfPaused(stoppingToken);
+                    await pauseService.WaitIfPaused();
 
                     var task = await queueService.DequeueAsync(stoppingToken);
                     LogTask(DateTime.UtcNow, workerId, task);
-                    
+
                     await Task.Delay(task.Length * 100, stoppingToken);
                 }
             }, stoppingToken));
+
         }
+
         return Task.WhenAll(tasks);
     }
 

@@ -13,7 +13,7 @@ public static class TaskEndpoints
         group.MapPost("resume", ResumeEndpoint);
     }
 
-    private static async Task<IResult> PostTask([FromQuery] string? task, TaskQueueService queueService)
+    private static async Task<IResult> PostTask([FromQuery] string? task, QueueService queueService)
     {
         if (string.IsNullOrWhiteSpace(task))
             return Results.BadRequest("Task cannot be empty.");
@@ -22,13 +22,13 @@ public static class TaskEndpoints
         return Results.Accepted();
     }
 
-    private static IResult PauseEndpoint(IPauseService pauseService)
+    private static IResult PauseEndpoint(PauseService pauseService)
     {
         pauseService.Pause();
         return Results.Ok("Paused");
     }
 
-    private static IResult ResumeEndpoint(IPauseService pauseService)
+    private static IResult ResumeEndpoint(PauseService pauseService)
     {
         pauseService.Resume();
         return Results.Ok("Resumed");
