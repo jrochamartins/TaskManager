@@ -28,10 +28,8 @@ public partial class BackgroundProcessor(
         while (!token.IsCancellationRequested)
         {
             await pauseService.WaitIfPaused();
-
             var task = await queueService.DequeueAsync(token);
             LogTask(DateTime.UtcNow, workerId, task);
-
             await Task.Delay(task.Length * 100, token);
         }
     }
