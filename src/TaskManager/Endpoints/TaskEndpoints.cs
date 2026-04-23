@@ -7,9 +7,10 @@ public static class TaskEndpoints
 {
     public static void MapTaskEndpoints(WebApplication app)
     {
-        app.MapPost("/api/tasks", PostTask);
-        app.MapPost("/api/pause", PauseEndpoint);
-        app.MapPost("/api/resume", ResumeEndpoint);
+        var group = app.MapGroup("api");
+        group.MapPost("tasks", PostTask);
+        group.MapPost("pause", PauseEndpoint);
+        group.MapPost("resume", ResumeEndpoint);
     }
 
     private static async Task<IResult> PostTask([FromQuery] string? task, TaskQueueService queueService)
